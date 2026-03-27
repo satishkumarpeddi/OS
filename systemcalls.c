@@ -10,4 +10,5 @@ void main(){
     }
     printf("File Open successfully\n");
     printf("File Descriptor: %d\n",fd);
+    close(fd);
 }
