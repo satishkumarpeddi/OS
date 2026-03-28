@@ -1,82 +1,76 @@
 #include <stdio.h>
 
-int main()
-{
-    int i, j, min;
-    int rs[25], m[10], count[10], flag[25];
-    int n, f, pf = 0, next = 1;
+int main() {
+    int i, j, min, n, f, pf = 0, next = 1;
+    int rs[25], m[10], count[10];
 
-    printf("Enter the length of reference string -- ");
+    printf("Enter the length of reference string: ");
     scanf("%d", &n);
 
-    printf("Enter the reference string -- ");
+    printf("Enter the reference string: ");
     for (i = 0; i < n; i++)
-    {
         scanf("%d", &rs[i]);
-    }
 
-    printf("Enter the number of frames -- ");
+    printf("Enter the number of frames: ");
     scanf("%d", &f);
 
-    // Initialize memory and counters
-    for (i = 0; i < f; i++)
-    {
+    // Initialize frames and counters
+    for (i = 0; i < f; i++) {
         m[i] = -1;
         count[i] = 0;
     }
 
-    printf("\nThe Page Replacement process is -- \n");
+    printf("\nPage Replacement Process:\n");
 
-    for (i = 0; i < n; i++)
-    {
-        flag[i] = 0;   // 🔥 FIX: Reset flag for each iteration
+    for (i = 0; i < n; i++) {
+        int found = 0;
 
-        // Check if page already in memory (HIT)
-        for (j = 0; j < f; j++)
-        {
-            if (m[j] == rs[i])
-            {
-                flag[i] = 1;
+        // Check if page already exists
+        for (j = 0; j < f; j++) {
+            if (m[j] == rs[i]) {
+                found = 1;
                 count[j] = next++;
                 break;
             }
         }
 
-        // If page not found (PAGE FAULT)
-        if (flag[i] == 0)
-        {
-            if (i < f)
-            {
-                m[i] = rs[i];
-                count[i] = next++;
-            }
-            else
-            {
-                min = 0;
-                for (j = 1; j < f; j++)
-                {
-                    if (count[j] < count[min])
-                        min = j;
+        // If page not found → Page Fault
+        if (!found) {
+            int pos;
+
+            // If empty frame exists
+            for (j = 0; j < f; j++) {
+                if (m[j] == -1) {
+                    pos = j;
+                    break;
                 }
-
-                m[min] = rs[i];
-                count[min] = next++;
             }
 
+            // If all frames filled → Replace LRU
+            if (j == f) {
+                pos = 0;
+                for (j = 1; j < f; j++) {
+                    if (count[j] < count[pos])
+                        pos = j;
+                }
+            }
+
+            m[pos] = rs[i];
+            count[pos] = next++;
             pf++;
         }
 
-        // Print frames
+        // Print frame status
         for (j = 0; j < f; j++)
             printf("%d\t", m[j]);
 
-        if (flag[i] == 0)
+        if (!found)
             printf("PF No. -- %d", pf);
 
         printf("\n");
     }
 
-    printf("\nThe number of page faults using LRU are %d\n", pf);
+    printf("\nTotal Page Faults (LRU): %d\n", pf);
 
     return 0;
 }
